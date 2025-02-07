@@ -1,0 +1,8 @@
+.env
+client_secret.json
+test.py
+auth_files/
+cache_files/
+demo_frontend/
+__pycache__/
+.vscode/

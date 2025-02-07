@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Playlist Metadata</title>
+</head>
+
+<body>
+    <h1>Playlist Metadata</h1>
+    {% if metadata %}
+
+    <a href="/spotify/target">Export to Spotify Account</a><br>
+    <a href="/youtube/target">Export to Youtube Account</a><br>
+    <a href="/youtubemusic/target">Export to Youtube Music Account</a><br>
+
+    {% if playlist_name %}
+    <h3>{{ playlist_name }}</h3>
+    {% endif %}
+    <ol>
+
+        {% for data in metadata %}
+        <li> Song name : {{ data.song_name }} <br> Artist Name : {{ data.artist_name }} <br> Song ID : {{ data.song_id }}</li>
+        {% endfor %}
+
+    </ol>
+
+    {% else %}
+    <p>No metadata available</p>
+    {% endif %}
+
+    <!-- For redirecting back to source page -->
+
+    {% if session['source-service'] == 'spotify' %}
+
+    {% if session['spotify_logged_in'] == 'False' %}
+    <a href="/spotify">Transfer another Playlist</a><br>
+    {% else %}
+    <a href="/spotify/playlists">Transfer another Playlist</a><br>
+    {% endif %}
+    
+    {% elif session['source-service'] == 'youtube' %}
+
+    {% if session['youtube_logged_in'] == False %}
+    <a href="/youtube">Transfer another Playlist</a><br>
+    {% else %}
+    <a href="/youtube/playlists">Transfer another Playlist</a><br>
+    {% endif %}
+
+    {% elif session['source-service'] == 'youtubemusic' %}
+    
+    {% if session['youtube_music_logged_in'] == False %}
+    <a href="/youtubemusic">Transfer another Playlist</a><br>
+    {% else %}
+    <a href="/youtubemusic/playlists">Transfer another Playlist</a><br>
+    {% endif %}
+
+    {% endif %}
+    <a href="/logout">Logout</a>
+</body>
+
+</html>

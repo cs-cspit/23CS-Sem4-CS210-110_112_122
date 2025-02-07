@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify</title>
+</head>
+
+<body>
+    {% with messages = get_flashed_messages() %}
+
+    {% if messages %}
+
+    <h3>New Alerts</h3>
+    <ol>
+    {% for message in messages %}
+
+    <li>{{ message }}</li>
+
+    {% endfor %}
+    </ol>
+
+    {% endif %}
+
+    {% endwith %}
+    <h1>Spotify</h1><br><br><br>
+    <div>
+        <form action="{{url_for('extract_from_spotify')}}" method="post">
+            <label for="url">Enter a Spotify playlist URL:</label>
+            <input type="text" name="url" required>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    <div>
+        <a href="/spotify/source">Login to spotify account and select your own playlist</a>
+    </div>
+</body>
+
+</html>

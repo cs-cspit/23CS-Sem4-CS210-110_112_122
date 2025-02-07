@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    There was some problem while performing your desired action.
+    {% if error %}
+    <p>{{error}}</p>
+    {% endif %}
+    <p><a href="{{ url_for('logout') }}">Logout</a> and try again</p>
+</body>
+</html>

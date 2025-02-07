@@ -1,0 +1,43 @@
+<!-- playlists.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Playlist Viewer</title>
+    <style>
+        .playlist {
+            margin: 2rem;
+        }
+
+        .playlist_container {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(280px, 1fr));
+            gap: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Select a Playlist to View Metadata</h1>
+
+    <div class="playlist_container">
+        {% for playlist in playlists %}
+
+        <div class="playlist">
+            <img src="{{ playlist.images[0].url }}" alt="Playlist Image" style="height: 150px; width: 150px;">
+            <h3>{{ playlist.name }}</h3>
+            <form action="{{ url_for('spotifyplaylists') }}" method="POST">
+                <input type="hidden" value="{{ playlist.id}}" name="playlist_id">
+                <input type="submit" value="View Songs">
+            </form>
+        </div>
+
+        {% endfor %}
+    </div>
+    <br>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+
+</html>

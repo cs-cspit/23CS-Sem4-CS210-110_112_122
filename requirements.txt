@@ -1,0 +1,12 @@
+flask
+spotipy
+google-auth-oauthlib
+google-auth
+google-auth-httplib2
+google-api-python-client
+uuid
+python-dotenv
+requests
+pymongodb
+pyDes
+ytmusicapi

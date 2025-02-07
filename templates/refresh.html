@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <style>
+        .demo{
+            color: blue; 
+            text-decoration: underline; 
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <p>There was some error proceeding ahead!</p>
+    <p>Please <span class="demo" onclick="refresh()">refresh</span> to try again.</p>
+
+    <p>If that doesn't work, start over <a href="/logout">again</a></p>
+    <script>
+        function refresh(){
+            location.reload();
+        }
+    </script>
+</body>
+</html>

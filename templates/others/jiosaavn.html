@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JioSaavn</title>
+</head>
+<body>
+    {% with messages = get_flashed_messages() %}
+
+    {% if messages %}
+
+    <h3>New Alerts</h3>
+    <ol>
+    {% for message in messages %}
+
+    <li>{{ message }}</li>
+
+    {% endfor %}
+    </ol>
+
+    {% endif %}
+
+    {% endwith %}
+    <h1>JioSaavn</h1>
+    <form action="" method="post">
+        <label for="url">Enter the JioSaavn playlist url</label>
+        <input type="text" name="url" required>
+        <input type="submit">
+    </form>
+</body>
+</html>
