@@ -117,6 +117,7 @@ def extract_tracks_from_url(sp, playlist_id):
 async def search_with_noise_data(i, sp, track_name, artist_name):
 
     cleaned_artist = youtube_helper.clean_artist_name(artist_name)
+    print(cleaned_artist)
     cleaned_track = remove_artist_from_title(track_name, cleaned_artist)
     if not cleaned_track:
         cleaned_track = track_name

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Source</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'rgba(124, 58, 237)',
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .active{
+            display: block;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans overflow-x-hidden">
+
+    <nav class="fixed top-0 w-full bg-white shadow-md z-50">
+        <div class="container mx-auto px-7 py-5 flex justify-between items-center">
+            <div class="text-3xl font-bold text-purple-600">MusicLink</div>
+            
+            <div class="nav-links flex space-x-4 items-center hidden md:block">
+                <a href="{{url_for('index')}}" class="text-lg bg-white font-semibold text-primary px-4 py-2 rounded-full hover:bg-purple-700 hover:text-white transition">Home</a>
+            </div>
+
+            <button id="mobile-menu" class="md:hidden">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <h1 class="text-3xl font-bold text-center mb-12">Choose Your Source Platform</h1>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <a href="{{url_for('spotify')}}"
+                    class=" bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 transition-transform duration-300 ease-in-out lg:hover:scale-105 lg:hover:rotate-2">
+                    <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100"
+                        viewBox="0 0 50 50">
+                        <path
+                            d="M25.009,1.982C12.322,1.982,2,12.304,2,24.991S12.322,48,25.009,48s23.009-10.321,23.009-23.009S37.696,1.982,25.009,1.982z M34.748,35.333c-0.289,0.434-0.765,0.668-1.25,0.668c-0.286,0-0.575-0.081-0.831-0.252C30.194,34.1,26,33,22.5,33.001 c-3.714,0.002-6.498,0.914-6.526,0.923c-0.784,0.266-1.635-0.162-1.897-0.948s0.163-1.636,0.949-1.897 c0.132-0.044,3.279-1.075,7.474-1.077C26,30,30.868,30.944,34.332,33.253C35.022,33.713,35.208,34.644,34.748,35.333z M37.74,29.193 c-0.325,0.522-0.886,0.809-1.459,0.809c-0.31,0-0.624-0.083-0.906-0.26c-4.484-2.794-9.092-3.385-13.062-3.35 c-4.482,0.04-8.066,0.895-8.127,0.913c-0.907,0.258-1.861-0.272-2.12-1.183c-0.259-0.913,0.272-1.862,1.184-2.12 c0.277-0.079,3.854-0.959,8.751-1c4.465-0.037,10.029,0.61,15.191,3.826C37.995,27.328,38.242,28.388,37.74,29.193z M40.725,22.013 C40.352,22.647,39.684,23,38.998,23c-0.344,0-0.692-0.089-1.011-0.275c-5.226-3.068-11.58-3.719-15.99-3.725 c-0.021,0-0.042,0-0.063,0c-5.333,0-9.44,0.938-9.481,0.948c-1.078,0.247-2.151-0.419-2.401-1.495 c-0.25-1.075,0.417-2.149,1.492-2.4C11.729,16.01,16.117,15,21.934,15c0.023,0,0.046,0,0.069,0 c4.905,0.007,12.011,0.753,18.01,4.275C40.965,19.835,41.284,21.061,40.725,22.013z">
+                        </path>
+                    </svg>
+                    <p class="text-xl font-semibold text-center">Spotify</p>
+                </a>
+                <a href="{{url_for('youtube')}}"
+                    class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 transition-transform duration-300 ease-in-out lg:hover:scale-105 lg:hover:rotate-2">
+                    <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 50 50">
+                        <path d="M 44.898438 14.5 C 44.5 12.300781 42.601563 10.699219 40.398438 10.199219 C 37.101563 9.5 31 9 24.398438 9 C 17.800781 9 11.601563 9.5 8.300781 10.199219 C 6.101563 10.699219 4.199219 12.199219 3.800781 14.5 C 3.398438 17 3 20.5 3 25 C 3 29.5 3.398438 33 3.898438 35.5 C 4.300781 37.699219 6.199219 39.300781 8.398438 39.800781 C 11.898438 40.5 17.898438 41 24.5 41 C 31.101563 41 37.101563 40.5 40.601563 39.800781 C 42.800781 39.300781 44.699219 37.800781 45.101563 35.5 C 45.5 33 46 29.398438 46.101563 25 C 45.898438 20.5 45.398438 17 44.898438 14.5 Z M 19 32 L 19 18 L 31.199219 25 Z"></path>
+                        </svg>
+                        <p class="text-xl font-semibold text-center">Youtube</p>
+                    </a>
+
+                <a href="{{url_for('youtubemusic')}}"
+                    class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 transition-transform duration-300 ease-in-out lg:hover:scale-105 lg:hover:rotate-2"">
+                    <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 50 50">
+                        <path d="M 25 3 C 12.85 3 3 12.85 3 25 C 3 37.15 12.85 47 25 47 C 37.15 47 47 37.15 47 25 C 47 12.85 37.15 3 25 3 z M 25 11 C 32.72 11 39 17.28 39 25 C 39 32.72 32.72 39 25 39 C 17.28 39 11 32.72 11 25 C 11 17.28 17.28 11 25 11 z M 25 13 C 18.383 13 13 18.383 13 25 C 13 31.617 18.383 37 25 37 C 31.617 37 37 31.617 37 25 C 37 18.383 31.617 13 25 13 z M 22.019531 18.501953 C 22.194031 18.505203 22.366984 18.552484 22.521484 18.646484 L 31.521484 24.146484 C 31.817484 24.327484 32 24.651 32 25 C 32 25.349 31.818484 25.671516 31.521484 25.853516 L 22.521484 31.353516 C 22.361484 31.450516 22.181 31.5 22 31.5 C 21.832 31.5 21.663719 31.456094 21.511719 31.371094 C 21.195719 31.194094 21 30.861 21 30.5 L 21 19.5 C 21 19.139 21.195719 18.805906 21.511719 18.628906 C 21.670219 18.540906 21.845031 18.498703 22.019531 18.501953 z"></path>
+                        </svg>
+                        <p class="text-xl font-semibold text-center">YouTube Music</p>
+                    </a>
+
+                <a href="{{url_for('jiosaavn')}}"
+                    class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 transition-transform duration-300 ease-in-out lg:hover:scale-105 lg:hover:rotate-2"">
+                    <svg  class="mx-auto" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 50 50">
+                        <path d="M 14 4.9902344 C 9.03 4.9902344 5 9.0202344 5 13.990234 L 5 35.990234 C 5 40.960234 9.03 44.990234 14 44.990234 L 30.210938 44.990234 C 29.580938 43.770234 29.180781 42.42 29.050781 41 L 27.529297 41 C 26.719297 41 26.280078 40.029687 26.830078 39.429688 C 27.560078 38.629688 28.440391 37.830078 29.400391 37.080078 C 30.680391 32.430078 34.96 29 40 29 C 41.8 29 43.5 29.440938 45 30.210938 L 45 13.990234 C 45 9.0202344 40.97 4.9902344 36 4.9902344 L 14 4.9902344 z M 14.650391 9 C 14.870391 9 15.060156 9.1205469 15.160156 9.3105469 C 18.090156 15.400547 23.119141 29.299688 23.119141 38.179688 C 28.749141 26.099688 28.880938 15.400781 28.210938 10.050781 C 28.140937 9.4907812 28.580625 9 29.140625 9 L 35.349609 9 C 38.469609 9 41 11.530391 41 14.650391 L 41 20.429688 C 41 20.829687 40.739141 21.170547 40.369141 21.310547 C 37.559141 22.390547 26.239844 29.6 25.089844 41 L 22.080078 41 C 20.920078 30.42 13.909297 20.749297 9.5292969 18.779297 C 9.1992969 18.639297 9 18.299453 9 17.939453 L 9 14.650391 C 9 11.530391 11.530391 9 14.650391 9 z M 40 31 C 35.05 31 31 35.05 31 40 C 31 44.95 35.05 49 40 49 C 44.95 49 49 44.95 49 40 C 49 35.05 44.95 31 40 31 z M 10.039062 33.429688 C 13.549062 33.849688 17.799609 36.659687 20.349609 39.429688 C 20.899609 40.029687 20.460625 41 19.640625 41 L 14.650391 41 C 11.530391 41 9 38.469609 9 35.349609 L 9 34.369141 C 9 33.809141 9.4890625 33.359687 10.039062 33.429688 z M 44.619141 35.003906 C 44.742891 35.003906 44.990234 35.059766 44.990234 35.509766 L 44.990234 39.160156 L 44.990234 42.509766 C 44.990234 43.059766 44.3 44.009766 42.75 44.009766 C 41.2 44.009766 41 43.009766 41 42.509766 C 41 41.759766 41.8 41.009766 43 41.009766 C 44.1 41.009766 44 40.709766 44 40.259766 L 44 38.050781 C 44 37.700781 43.999609 37.599219 43.599609 37.699219 C 42.949609 37.849219 39.349219 38.75 39.199219 38.75 C 39.049219 38.8 39 38.899219 39 39.199219 L 39 43.490234 C 39 44.040234 38.3 44.990234 36.75 44.990234 C 35.2 44.990234 35 43.990234 35 43.490234 C 35 42.740234 35.8 41.990234 37 41.990234 C 38.1 41.990234 38 41.690234 38 41.240234 L 38 36.759766 C 38 36.509766 38.099609 36.360547 38.349609 36.310547 C 38.749609 36.210547 44.550781 35.009766 44.550781 35.009766 C 44.550781 35.009766 44.577891 35.003906 44.619141 35.003906 z"></path>
+                        </svg>
+                        <p class="text-xl font-semibold text-center">JioSaavn</p>
+                    </a>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy;
+                <script>document.write(new Date().getFullYear());</script> MusicLink. All rights reserved.
+            </p>
+        </div>
+    </footer>
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu');
+        const navLinks = document.querySelector('.nav-links');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+    </script>
+</body>
+
+</html>

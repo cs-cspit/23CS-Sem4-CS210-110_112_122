@@ -6,3 +6,4 @@ cache_files/
 demo_frontend/
 __pycache__/
 .vscode/
+pending.txt

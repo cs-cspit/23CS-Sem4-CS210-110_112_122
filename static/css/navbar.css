@@ -1,0 +1,17 @@
+/* Mobile menu toggle */
+#mobile-menu { display: none; }
+@media (max-width: 768px) {
+    .nav-links { 
+        display: none; 
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        padding: 2rem;
+        background: white;
+        flex-direction: column;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .nav-links.active { display: flex; }
+    #mobile-menu { display: block; }
+}

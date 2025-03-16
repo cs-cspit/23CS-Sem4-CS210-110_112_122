@@ -56,6 +56,10 @@ def page_not_found(e):
 def index():
     return render_template("index.html")
 
+@app.route("/source")
+def source():
+    return render_template("source.html")
+
 #Spotify Home Page
 @app.route("/spotify")
 def spotify():
@@ -162,7 +166,7 @@ def spotifyplaylists():
         flash("Some error occurred while fetching your playlists")
         return redirect('/spotify')
 
-    return render_template("spotify/playlists.html", playlists=playlists)
+    return render_template("spotify/demo-playlists.html", playlists=playlists)
 
 #Spotify metadata from playlist url
 @app.route('/extract/spotify', methods=['POST'])
@@ -387,15 +391,17 @@ def youtubemusicplaylists():
     ytmusic = YTMusic(auth_file)
         
     if request.method == 'POST':
-        #Get the playlist id from the form
         try:
+            #Get the playlist id from the form
             playlist_id = request.form['playlist_id']
+            print(playlist_id)
             # ytmusic_helper.extract_tracks_from_playlist(ytmusic, playlist_id)
             playlist_details = ytmusic.get_playlist(playlist_id)
-            playlist_name = playlist_details['title', None]
+            print(playlist_details)
+            playlist_name = playlist_details['title'] if playlist_details['title'] else "Playlist"
             songs = []
             print("Length  of ", playlist_name ," : " , len(playlist_details['tracks']))
-            # Fetch initial batch of songs
+
             for track in playlist_details['tracks']:
                 songs.append({
                     'song_name': track['title'],
@@ -524,10 +530,8 @@ def transfer_spotify():
 
                 for i, (uri, song) in enumerate(zip(results, metadata), 1):
                     if uri != "no_result_found":
-                        # print(f"{i}. Found: {song['song_name']}")
                         track_uris.append(uri)
                     else:
-                        # print(f"{i}. Not found: {song['song_name']}")
                         not_found.append(song['song_name'])
             
             asyncio.run(process_tracks(metadata))
@@ -685,7 +689,7 @@ def transfer_youtubemusic():
                 else:
                     not_found.append(song['song_name'])
         else:
-            #Add logic so it searches the ID from YT Music -----------------------------------------------------------------------------------
+            #To-do : Add logic so it searches the ID from YT Music -----------------------------------------------------------------------------------
             async def process_tracks(metadata):
                 tasks = []
 
