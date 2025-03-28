@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Playlists - MusicLink</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            light: '#8B5CF6', // Purple
+                            DEFAULT: '#7C3AED',
+                            dark: '#6D28D9',
+                        },
+                        secondary: {
+                            light: '#93C5FD', // Light blue
+                            DEFAULT: '#60A5FA',
+                            dark: '#3B82F6',
+                        },
+                        spotify: 'rgb(29, 185, 84)',
+                        youtube: '#FF0000',
+                        youtubemusic: '#FF0000',
+                        jiosaavn: '#1eccb0',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        pulse: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0.7' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        }
+                    },
+                    animation: {
+                        fadeIn: 'fadeIn 0.8s ease-out',
+                        pulse: 'pulse 2s infinite',
+                        float: 'float 3s ease-in-out infinite'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom gradient text that works in both light and dark mode */
+        .text-gradient {
+            background: linear-gradient(to right, #8B5CF6, #93C5FD);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.7s ease;
+        }
+
+        .reveal-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .playlist-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            transition: all 0.3s;
+            transform: translateZ(0);
+        }
+        
+        .playlist-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: scale(1.05) translateZ(0);
+        }
+        
+        .dark .playlist-card {
+            background-color: #1f2937;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-gray-900 transition-colors duration-300">
+    <!-- Navigation Bar -->
+    <nav class="fixed w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md z-50 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <img src="./logo.png" alt="" class="h-8 w-8">
+                        <span class="ml-2 text-xl font-bold text-gray-900 dark:text-white">MusicLink</span>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html"
+                        class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors font-bold">Home</a>
+                    <a href="source.html" class="text-primary dark:text-primary-light font-bold">Convert</a>
+                    <a href="index.html#how-it-works"
+                        class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors font-bold">How
+                        It Works</a>
+                </div>
+                <div class="flex items-center md:hidden">
+                    <!-- Theme toggle button moved before hamburger menu in mobile view -->
+                    <button id="mobile-theme-toggle"
+                        class="p-2 mr-2 rounded-full text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                        <!-- Sun icon for dark mode -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden dark:block" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <!-- Moon icon for light mode -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 block dark:hidden" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                    <button id="mobile-menu-button"
+                        class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="hidden md:flex items-center">
+                    <button id="desktop-theme-toggle"
+                        class="p-2 rounded-full text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                        <!-- Sun icon for dark mode -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden dark:block" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <!-- Moon icon for light mode -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 block dark:hidden" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-900 pb-4 px-4 transition-all duration-300">
+            <div class="flex flex-col space-y-4">
+                <a href="index.html"
+                    class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors font-bold">Home</a>
+                <a href="source.html" class="text-primary dark:text-primary-light font-bold">Convert</a>
+                <a href="index.html#how-it-works"
+                    class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors font-bold">How
+                    It Works</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Playlists Header Section -->
+    <section class="pt-32 pb-10 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center mb-8">
+                <a href="source.html" class="text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light mr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </a>
+                <span class="text-gray-500 dark:text-gray-400">Back to sources</span>
+            </div>
+            
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-10 animate-fadeIn">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Your Playlists</h1>
+                    <p class="text-lg text-gray-700 dark:text-gray-300">
+                        Select a playlist to transfer
+                    </p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <div class="relative">
+                        <input type="text" 
+                               id="search-playlists" 
+                               placeholder="Search playlists..." 
+                               class="pl-10 pr-4 py-2 rounded-md w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Playlists Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                <!-- Playlist 1 -->
+                <a href="preview.html" class="playlist-card animate-fadeIn" style="animation-delay: 0.1s;">
+                    <div class="relative pb-[100%] bg-gray-200 dark:bg-gray-700">
+                        <img src="https://picsum.photos/id/304/300/300" alt="Summer Hits 2023" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 flex items-end p-4 transition-opacity duration-300">
+                            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-900 dark:text-white mb-1 truncate">Summer Hits 2023</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">143 songs</p>
+                    </div>
+                </a>
+                
+                <!-- Playlist 2 -->
+                <a href="preview.html" class="playlist-card animate-fadeIn" style="animation-delay: 0.15s;">
+                    <div class="relative pb-[100%] bg-gray-200 dark:bg-gray-700">
+                        <img src="https://picsum.photos/id/28/300/300" alt="Workout Mix" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 flex items-end p-4 transition-opacity duration-300">
+                            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-900 dark:text-white mb-1 truncate">Workout Mix</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">87 songs</p>
+                    </div>
+                </a>
+                
+                <!-- Playlist 3 -->
+                <a href="preview.html" class="playlist-card animate-fadeIn" style="animation-delay: 0.2s;">
+                    <div class="relative pb-[100%] bg-gray-200 dark:bg-gray-700">
+                        <img src="https://picsum.photos/id/96/300/300" alt="Chill Vibes" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 flex items-end p-4 transition-opacity duration-300">
+                            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-900 dark:text-white mb-1 truncate">Chill Vibes</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">212 songs</p>
+                    </div>
+                </a>
+                
+                <!-- Playlist 4 -->
+                <a href="preview.html" class="playlist-card animate-fadeIn" style="animation-delay: 0.25s;">
+                    <div class="relative pb-[100%] bg-gray-200 dark:bg-gray-700">
+                        <img src="https://picsum.photos/id/240/300/300" alt="Road Trip" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 flex items-end p-4 transition-opacity duration-300">
+                            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-900 dark:text-white mb-1 truncate">Road Trip</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">98 songs</p>
+                    </div>
+                </a>
+                
+                <!-- Playlist 5 -->
+                <a href="preview.html" class="playlist-card animate-fadeIn" style="animation-delay: 0.3s;">
+                    <div class="relative pb-[100%] bg-gray-200 dark:bg-gray-700">
+                        <img src="https://picsum.photos/id/1/300/300" alt="90s Classics" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 flex items-end p-4 transition-opacity duration-300">
+                            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-900 dark:text-white mb-1 truncate">90s Classics</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">179 songs</p>
+                    </div>
+                </a>
+                
+                <!-- Playlist 6 -->
+                <a href="preview.html" class="playlist-card animate-fadeIn" style="animation-delay: 0.35s;">
+                    <div class="relative pb-[100%] bg-gray-200 dark:bg-gray-700">
+                        <img src="https://picsum.photos/id/452/300/300" alt="Indie Discoveries" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 flex items-end p-4 transition-opacity duration-300">
+                            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-900 dark:text-white mb-1 truncate">Indie Discoveries</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">127 songs</p>
+                    </div>
+                </a>
+                
+                <!-- Playlist 7 -->
+                <a href="preview.html" class="playlist-card animate-fadeIn" style="animation-delay: 0.4s;">
+                    <div class="relative pb-[100%] bg-gray-200 dark:bg-gray-700">
+                        <img src="https://picsum.photos/id/403/300/300" alt="Hip Hop Essentials" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 flex items-end p-4 transition-opacity duration-300">
+                            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-900 dark:text-white mb-1 truncate">Hip Hop Essentials</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">156 songs</p>
+                    </div>
+                </a>
+                
+                <!-- Playlist 8 -->
+                <a href="preview.html" class="playlist-card animate-fadeIn" style="animation-delay: 0.45s;">
+                    <div class="relative pb-[100%] bg-gray-200 dark:bg-gray-700">
+                        <img src="https://picsum.photos/id/122/300/300" alt="Electronic Mix" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 flex items-end p-4 transition-opacity duration-300">
+                            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-900 dark:text-white mb-1 truncate">Electronic Mix</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">108 songs</p>
+                    </div>
+                </a>
+                
+                <!-- More playlists can be added here -->
+            </div>
+        </div>
+    </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="text-center text-gray-400">
+            <p>&copy; 2025 MusicLink. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Dark mode toggle functionality
+        const desktopThemeToggle = document.getElementById('desktop-theme-toggle');
+        const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+
+        // Check for saved theme preference or use preferred color scheme
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // Function to toggle theme
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+
+            // Save preference
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Add event listeners to both theme toggle buttons
+        desktopThemeToggle.addEventListener('click', toggleTheme);
+        mobileThemeToggle.addEventListener('click', toggleTheme);
+
+        // Animation for playlist cards
+        document.addEventListener('DOMContentLoaded', () => {
+            const playlistCards = document.querySelectorAll('.playlist-card');
+            playlistCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('animate-fadeIn');
+                }, index * 50);
+            });
+        });
+
+        // Simple playlist search function
+        const searchInput = document.getElementById('search-playlists');
+        const playlistCards = document.querySelectorAll('.playlist-card');
+        
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            playlistCards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                if (title.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
