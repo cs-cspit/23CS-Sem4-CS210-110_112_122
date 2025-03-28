@@ -28,9 +28,16 @@ def get_liked_songs(auth_manager):
     while results:
 
         liked_songs.extend(
-            [{"song_name": track["track"]["name"], "artist_name": track["track"]["artists"][0]["name"], "song_id": track['track']['uri']} 
-            for track in results["items"] 
-            if track.get("track") and track["track"].get("name") and track["track"].get("artists")]
+            [
+                {
+                    "song_name": track["track"]["name"], 
+                    "artist_name": track["track"]["artists"][0]["name"], 
+                    "song_id": track['track']['uri'],
+                    "image_url": track["track"]["album"]["images"][0]["url"]
+                } 
+                for track in results["items"] 
+                if track.get("track") and track["track"].get("name") and track["track"].get("artists")
+            ]
         )
 
         results = sp.next(results) if results["next"] else None
@@ -47,9 +54,8 @@ def extract_playlist_id(url):
 def get_spotify_playlists(sp):
 
     try:
-
         playlists = sp.current_user_playlists()["items"]
-        playlists.append({"id": "liked_songs", "name": "Liked Songs", "images": [{'url':'https://media.istockphoto.com/id/1439973042/vector/red-heart-flat-icon-the-symbol-of-love-vector-illustration.webp?s=2048x2048&w=is&k=20&c=6V9Br8Yh8p_PTYkNwBKi_q-JJlG9Jq3dckt2QJMF4LE='}]})
+        playlists.append({"id": "liked_songs", "name": "Liked Songs", "images": [{'url':'https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da8470d229cb865e8d81cdce0889'}]})
 
     except Exception as e:
         playlists = []
@@ -60,7 +66,12 @@ def get_spotify_playlists(sp):
 def get_spotify_tracks(sp, playlist_id):
 
     tracks = []
-    playlist_name = sp.playlist(playlist_id)["name"]
+    playlist_data = sp.playlist(playlist_id)
+    playlist_name = playlist_data["name"]
+    if playlist_data["images"] and len(playlist_data["images"]) > 0:
+        playlist_image_url = playlist_data["images"][0]["url"]
+    else:
+        playlist_image_url = 0
     results = sp.playlist_tracks(playlist_id, limit=100, offset=0) 
 
     # Add tracks from the first page
@@ -73,17 +84,27 @@ def get_spotify_tracks(sp, playlist_id):
 
     # Filter metadata for valid tracks
     metadata = [
-        {"song_name": track["track"]["name"], "artist_name": track["track"]["artists"][0]["name"], "song_id": track['track']['uri']}
+        {
+            "song_name": track["track"]["name"], 
+            "artist_name": track["track"]["artists"][0]["name"], 
+            "song_id": track['track']['uri'],
+            "image_url": track["track"]["album"]["images"][0]["url"]
+        }
         for track in tracks
         if track.get("track") and track["track"].get("name") and track["track"].get("artists")
     ]
     
-    return [metadata, playlist_name]
+    return [metadata, playlist_name, playlist_image_url]
 
 #For fetching tracks from Spotify Playlist link
 def extract_tracks_from_url(sp, playlist_id):
 
-    playlist_name = sp.playlist(playlist_id)["name"]
+    playlist_data = sp.playlist(playlist_id)
+    playlist_name = playlist_data["name"]
+    if playlist_data["images"] and len(playlist_data["images"]) > 0:
+        playlist_image_url = playlist_data["images"][0]["url"]
+    else:
+        playlist_image_url = 0
     results = sp.playlist_tracks(playlist_id, limit=100, offset=0)  
 
     if not results:
@@ -99,14 +120,19 @@ def extract_tracks_from_url(sp, playlist_id):
 
     # Filter metadata for valid tracks 
     metadata = [
-        {"song_name": track["track"]["name"], "artist_name": track["track"]["artists"][0]["name"], "song_id": track['track']['uri']}
+        {
+            "song_name": track["track"]["name"], 
+            "artist_name": track["track"]["artists"][0]["name"], 
+            "song_id": track['track']['uri'],
+            "image_url": track["track"]["album"]["images"][0]["url"]
+        }
         for track in tracks
         if track.get("track") and track["track"].get("name") and track["track"].get("artists")
     ]
     
     session['spotify_logged_in'] = False
 
-    helper.upload_metadata(metadata, playlist_name)
+    helper.upload_metadata(metadata, playlist_name, playlist_image_url)
 
     if os.path.exists('./.cache'):
         os.remove('./.cache')

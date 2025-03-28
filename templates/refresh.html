@@ -3,24 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error</title>
-    <style>
-        .demo{
-            color: blue; 
-            text-decoration: underline; 
-            font-weight: bold;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <p>There was some error proceeding ahead!</p>
-    <p>Please <span class="demo" onclick="refresh()">refresh</span> to try again.</p>
-
-    <p>If that doesn't work, start over <a href="/logout">again</a></p>
+    <title>Session Error - MusicLink</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        function refresh(){
-            location.reload();
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            light: '#8B5CF6',
+                            DEFAULT: '#7C3AED',
+                            dark: '#6D28D9',
+                        },
+                        secondary: {
+                            light: '#93C5FD',
+                            DEFAULT: '#60A5FA',
+                            dark: '#3B82F6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white dark:bg-gray-900 min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 text-center">
+        <div class="mb-6">
+            <div class="bg-yellow-100 dark:bg-yellow-900/30 rounded-full p-4 w-16 h-16 mx-auto flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-600 dark:text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+            </div>
+        </div>
+        
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Session Error</h1>
+        
+        <p class="text-gray-600 dark:text-gray-400 mb-6">
+            We couldn't load your session data. A simple refresh should fix this. If the problem persists, please start over.
+        </p>
+        
+        <div class="space-y-4">
+            <button onclick="window.location.reload()" class="w-full bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg shadow-md font-medium transition-colors duration-300 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                </svg>
+                <span>Refresh Page</span>
+            </button>
+            
+            <a href="{{ url_for('logout') }}" class="block w-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg font-medium transition-colors duration-300 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Start Over</span>
+            </a>
+        </div>
+    </div>
+    
+    <div class="mt-8 text-center">
+        <a href="{{ url_for('index') }}" class="text-primary dark:text-primary-light hover:underline flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Return to Home</span>
+        </a>
+    </div>
+
+    <script>
+        // Check for saved theme preference or use preferred color scheme
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
         }
     </script>
 </body>

@@ -1,25 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transfer to Spotify</title>
+    <title>Playlist Metadata</title>
 </head>
+
 <body>
     <h1>Playlist Metadata</h1>
     {% if metadata %}
 
-    <form action="" method="post">
-        <button type="submit">Start Transfer</button>
-    </form>
+    <a href="/spotify/target">Export to Spotify Account</a><br>
+    <a href="/youtube/target">Export to Youtube Account</a><br>
+    <a href="/youtubemusic/target">Export to Youtube Music Account</a><br>
 
     {% if playlist_name %}
     <h3>{{ playlist_name }}</h3>
     {% endif %}
+    bruh
+    {% if url %}
+    <img src="{{ url }}" alt="Playlist Image" style="width: 200px; height: 200px;">
+    {% endif %}
     <ol>
 
         {% for data in metadata %}
-        <li> Song name : {{ data.song_name }} <br> Artist Name : {{ data.artist_name }}</li>
+        <li> Song name : {{ data.song_name }} <br> Artist Name : {{ data.artist_name }} <br> Song ID : {{ data.song_id }}</li>
         {% endfor %}
 
     </ol>
@@ -27,7 +31,6 @@
     {% else %}
     <p>No metadata available</p>
     {% endif %}
-
 
     <!-- For redirecting back to source page -->
 
@@ -58,4 +61,5 @@
     {% endif %}
     <a href="/logout">Logout</a>
 </body>
+
 </html>

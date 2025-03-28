@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusicLink - Convert Your Playlists</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/navbar.css')}}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+
+        .animate-fade-in { animation: fadeIn 1s ease-out; }
+        .animate-pulse { animation: pulse 2s infinite; }
+        .animate-slide-in { animation: slideIn 1s ease-out; }
+        .hero-bg { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); }
+        
+        @keyframes slideInFromLeft { 
+            from { 
+                opacity: 0; 
+                transform: translateX(-100%); 
+            } 
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            } 
+        }
+        .scroll-animation {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+        .scroll-animation.in-view {
+            animation: slideInFromLeft 1s ease-out forwards;
+        }
+        .active{
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans overflow-x-hidden">
+    <nav class="fixed top-0 w-full bg-white shadow-md z-50">
+        <div class="container mx-auto px-7 py-5 flex justify-between items-center">
+            <div class="text-3xl font-bold text-purple-600">MusicLink</div>
+            
+            <!-- <div class="nav-links flex space-x-4 items-center hidden md:block">
+                <a href="{{url_for('source')}}" class="bg-purple-600 text-white px-4 py-2 rounded-full hover:bg-purple-700 transition">Get Started</a>
+            </div> -->
+
+            <button id="mobile-menu" class="md:hidden">
+                <!-- <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg> -->
+            </button>
+        </div>
+    </nav>
+
+    <header class="hero-bg text-white pt-40 pb-16">
+        <div class="container mx-auto px-4 text-center animate-fade-in">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">Convert Playlists Across Platforms</h1>
+            <p class="text-lg md:text-xl mb-10">Seamlessly transfer your music between Spotify, YouTube, and more!</p>
+            <div>
+                <a href="{{url_for('source')}}" class="bg-white text-purple-600 px-6 md:px-8 py-3 md:py-4 rounded-full text-base md:text-lg font-semibold hover:bg-gray-100 transition">
+                    Start Converting Now
+                </a>
+            </div>
+        </div>
+    </header>    
+
+    <section class="container mx-auto px-4 py-16">
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-white p-6 rounded-lg shadow-md text-center scroll-animation">
+                <svg class="w-16 h-16 mx-auto mb-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 class="text-xl font-semibold mb-3">Easy Conversion</h3>
+                <p>Convert playlists with just a few clicks</p>
+            </div>            
+            <div class="bg-white p-6 rounded-lg shadow-md text-center scroll-animation">
+                <svg class="w-16 h-16 mx-auto mb-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 class="text-xl font-semibold mb-3">Quick Process</h3>
+                <p>Transfer playlists in seconds</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md text-center scroll-animation">
+                <svg class="w-16 h-16 mx-auto mb-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 class="text-xl font-semibold mb-3">Multi-Platform</h3>
+                <p>Support for multiple music platforms</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-gray-50 py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-10">How It Works</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:rotate-2">
+                    <div class="text-6xl font-bold text-purple-600 mb-4">1</div>
+                    <h3 class="text-xl font-semibold mb-3">Select Platform</h3>
+                    <p>Choose the source music platform</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:rotate-2">
+                    <div class="text-6xl font-bold text-purple-600 mb-4">2</div>
+                    <h3 class="text-xl font-semibold mb-3">Import Playlist</h3>
+                    <p>Import your existing playlist from the source platform</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:rotate-2">
+                    <div class="text-6xl font-bold text-purple-600 mb-4">3</div>
+                    <h3 class="text-xl font-semibold mb-3">Convert</h3>
+                    <p>Convert and export to your desired music platform</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container mx-auto px-4 py-16 text-center">
+        <h2 class="text-3xl font-bold mb-6">Supported Platforms</h2>
+        <div class="flex flex-col justify-center gap-8 lg:flex-row mt-12">
+            <div class="flex flex-col w-full lg:w-auto transition-transform duration-300 ease-in-out hover:scale-105 hover:rotate-2">
+                <img src="{{url_for('static', filename='spotify.jpg')}}" alt="Spotify" class="w-3/5 lg:h-24 lg:w-auto rounded-2xl self-center">
+                <p class="mt-2 font-semibold text-xl">Spotify</p>
+            </div>
+            <div class="flex flex-col w-full lg:w-auto transition-transform duration-300 ease-in-out hover:scale-105 hover:rotate-2">
+                <img src="{{url_for('static', filename='youtube.jpg')}}" alt="Youtube" class="w-3/5 lg:h-24 lg:w-auto rounded-2xl self-center">
+                <p class="mt-2 font-semibold text-xl">Youtube</p>
+            </div>
+            <div class="flex flex-col w-full lg:w-auto transition-transform duration-300 ease-in-out hover:scale-105 hover:rotate-2">
+                <img src="{{url_for('static', filename='youtube-music.jpg')}}" alt="Youtube Music" class="w-3/5 lg:h-24 lg:w-auto rounded-2xl self-center">
+                <p class="mt-2 font-semibold text-xl">Youtube Music</p>
+            </div>
+            <div class="flex flex-col w-full lg:w-auto transition-transform duration-300 ease-in-out hover:scale-105 hover:rotate-2">
+                <img src="{{url_for('static', filename='jiosaavn.png')}}" alt="JioSaavn" class="w-3/5 lg:h-24 lg:w-auto rounded-2xl self-center">
+                <p class="mt-2 font-semibold text-xl">JioSaavn</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; <script>document.write( new Date().getFullYear() );</script> MusicLink. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu');
+        const navLinks = document.querySelector('.nav-links');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Scroll reveal animation
+        window.addEventListener('scroll', function() {
+            const elements = document.querySelectorAll('.animate-slide-in');
+            elements.forEach(el => {
+                const position = el.getBoundingClientRect();
+                if(position.top < window.innerHeight * 0.8) {
+                    el.style.opacity = 1;
+                    el.style.transform = 'translateX(0)';
+                }
+            });
+        });
+
+        function checkScroll() {
+            const scrollAnimationElements = document.querySelectorAll('.scroll-animation');
+            
+            scrollAnimationElements.forEach(el => {
+                const elementTop = el.getBoundingClientRect().top;
+                const elementBottom = el.getBoundingClientRect().bottom;
+                
+                const isVisible = (
+                    elementTop < window.innerHeight && 
+                    elementBottom >= 0
+                );
+                
+                if (isVisible) {
+                    el.classList.add('in-view');
+                }
+            });
+        }
+
+        // Add scroll event listener
+        window.addEventListener('scroll', checkScroll);
+        
+        // Initial check in case elements are already in view
+        checkScroll();
+    </script>
+</body>
+</html>

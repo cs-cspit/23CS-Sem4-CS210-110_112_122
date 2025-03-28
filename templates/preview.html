@@ -1,61 +1,437 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Playlist Metadata</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlist Preview - MusicLink</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            light: '#8B5CF6', // Purple
+                            DEFAULT: '#7C3AED',
+                            dark: '#6D28D9',
+                        },
+                        secondary: {
+                            light: '#93C5FD', // Light blue
+                            DEFAULT: '#60A5FA',
+                            dark: '#3B82F6',
+                        },
+                        spotify: 'rgb(29, 185, 84)',
+                        youtube: '#FF0000',
+                        youtubemusic: '#FF0000',
+                        jiosaavn: '#1eccb0',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        pulse: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0.7' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        }
+                    },
+                    animation: {
+                        fadeIn: 'fadeIn 0.8s ease-out',
+                        pulse: 'pulse 2s infinite',
+                        float: 'float 3s ease-in-out infinite'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom gradient text that works in both light and dark mode */
+        .text-gradient {
+            background: linear-gradient(to right, #8B5CF6, #93C5FD);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.7s ease;
+        }
+
+        .reveal-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+        }
+    </style>
 </head>
 
-<body>
-    <h1>Playlist Metadata</h1>
-    {% if metadata %}
+<body class="bg-white dark:bg-gray-900 transition-colors duration-300">
+    <!-- Navigation Bar -->
+    <nav class="fixed w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md z-50 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{{ url_for('index') }}" class="flex items-center">
+                        <img src="{{ url_for('static', filename='logo.png') }}" alt="" class="h-8 w-8">
+                        <span class="ml-2 text-xl font-bold text-gray-900 dark:text-white">MusicLink</span>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="{{ url_for('index') }}"
+                        class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors font-bold">Home</a>
+                    <a href="{{ url_for('source') }}" class="text-primary dark:text-primary-light font-bold">Convert</a>
+                    <a href="{{ url_for('index') }}#how-it-works"
+                        class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors font-bold">How
+                        It Works</a>
+                    <a href="{{ url_for('logout') }}"
+                        class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors font-bold">Clear Data</a>
+                </div>
+                <div class="flex items-center md:hidden">
+                    <!-- Theme toggle button moved before hamburger menu in mobile view -->
+                    <button id="mobile-theme-toggle"
+                        class="p-2 mr-2 rounded-full text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                        <!-- Sun icon for dark mode -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden dark:block" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <!-- Moon icon for light mode -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 block dark:hidden" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                    <button id="mobile-menu-button"
+                        class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="hidden md:flex items-center">
+                    <button id="desktop-theme-toggle"
+                        class="p-2 rounded-full text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                        <!-- Sun icon for dark mode -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden dark:block" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <!-- Moon icon for light mode -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 block dark:hidden" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-900 pb-4 px-4 transition-all duration-300">
+            <div class="flex flex-col space-y-4">
+                <a href="{{ url_for('index') }}"
+                    class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors font-bold">Home</a>
+                <a href="{{ url_for('source') }}" class="text-primary dark:text-primary-light font-bold">Convert</a>
+                <a href="{{ url_for('index') }}#how-it-works"
+                    class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors font-bold">How
+                    It Works</a>
+                <a href="{{ url_for('logout') }}"
+                    class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors font-bold">Clear Data</a>
+            </div>
+        </div>
+    </nav>
 
-    <a href="/spotify/target">Export to Spotify Account</a><br>
-    <a href="/youtube/target">Export to Youtube Account</a><br>
-    <a href="/youtubemusic/target">Export to Youtube Music Account</a><br>
+    <main>
+        <!-- Playlist Preview Header -->
+        <section class="pt-32 pb-6 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center mb-8">
+                    <a href="javascript:history.back()"
+                        class="text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light mr-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                    </a>
+                    <span class="text-gray-500 dark:text-gray-400">Back</span>
+                </div>
 
-    {% if playlist_name %}
-    <h3>{{ playlist_name }}</h3>
-    {% endif %}
-    <ol>
+                <div class="flex flex-col md:flex-row animate-fadeIn">
+                    <div class="md:w-1/4 mb-6 md:mb-0">
+                        <div class="relative w-full max-w-[300px] mx-auto md:mx-0">
+                            <div class="pb-[100%] relative overflow-hidden rounded-xl shadow-lg">
+                                {% if session['source-service'] == 'jiosaavn' %}
+                                <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-teal-400 to-jiosaavn flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="150" height="150"
+                                        viewBox="0,0,256,256" class="opacity-80" aria-hidden="true">
+                                        <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt"
+                                            stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0"
+                                            font-family="none" font-weight="none" font-size="none" text-anchor="none"
+                                            style="mix-blend-mode: normal">
+                                            <g transform="scale(5.12,5.12)">
+                                                <path
+                                                    d="M14,4.99023c-4.97,0 -9,4.03 -9,9v22c0,4.97 4.03,9 9,9h16.21094c-0.63,-1.22 -1.03016,-2.57023 -1.16016,-3.99023h-1.52148c-0.81,0 -1.24922,-0.97031 -0.69922,-1.57031c0.73,-0.8 1.61031,-1.59961 2.57031,-2.34961c1.28,-4.65 5.55961,-8.08008 10.59961,-8.08008c1.8,0 3.5,0.44094 5,1.21094v-16.2207c0,-4.97 -4.03,-9 -9,-9zM14.65039,9c0.22,0 0.40976,0.12055 0.50976,0.31055c2.93,6.09 7.95898,19.98914 7.95898,28.86914c5.63,-12.08 5.7618,-22.77891 5.0918,-28.12891c-0.07,-0.56 0.36969,-1.05078 0.92969,-1.05078h6.20898c3.12,0 5.65039,2.53039 5.65039,5.65039v5.7793c0,0.4 -0.26086,0.74086 -0.63086,0.88086c-2.81,1.08 -14.1293,8.28945 -15.2793,19.68945h-3.00977c-1.16,-10.58 -8.17078,-20.2507 -12.55078,-22.2207c-0.33,-0.14 -0.5293,-0.47984 -0.5293,-0.83984v-3.28906c0,-3.12 2.53039,-5.65039 5.65039,-5.65039zM40,31c-4.95,0 -9,4.05 -9,9c0,4.95 4.05,9 9,9c4.95,0 9,-4.05 9,-9c0,-4.95 -4.05,-9 -9,-9zM10.03906,33.42969c3.51,0.42 7.76055,3.23 10.31055,6c0.55,0.6 0.11102,1.57031 -0.70898,1.57031h-4.99023c-3.12,0 -5.65039,-2.53039 -5.65039,-5.65039v-0.98047c0,-0.56 0.48906,-1.00945 1.03906,-0.93945zM44.61914,35.00391c0.12375,0 0.37109,0.05586 0.37109,0.50586v3.65039v3.34961c0,0.55 -0.69023,1.5 -2.24023,1.5c-1.55,0 -1.75,-1 -1.75,-1.5c0,-0.75 0.8,-1.5 2,-1.5c1.1,0 1,-0.3 1,-0.75v-2.20898c0,-0.35 -0.00039,-0.45156 -0.40039,-0.35156c-0.65,0.15 -4.25039,1.05078 -4.40039,1.05078c-0.15,0.05 -0.19922,0.14922 -0.19922,0.44922v4.29102c0,0.55 -0.7,1.5 -2.25,1.5c-1.55,0 -1.75,-1 -1.75,-1.5c0,-0.75 0.8,-1.5 2,-1.5c1.1,0 1,-0.3 1,-0.75v-4.48047c0,-0.25 0.09961,-0.39922 0.34961,-0.44922c0.4,-0.1 6.20117,-1.30078 6.20117,-1.30078c0,0 0.02711,-0.00586 0.06836,-0.00586z">
+                                                </path>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                    {% if playlist_name %}
+                                    <span class="absolute bottom-4 left-4 right-4 text-white font-bold text-xl truncate">{{ playlist_name }}</span>
+                                    {% endif %}
+                                </div>
+                                {% elif url %}
+                                <img src="{{ url }}" alt="{{ playlist_name }}" class="absolute inset-0 w-full h-full object-cover">
+                                {% else %}
+                                <img src="https://picsum.photos/id/304/300/300" alt="Playlist Cover" class="absolute inset-0 w-full h-full object-cover">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
 
-        {% for data in metadata %}
-        <li> Song name : {{ data.song_name }} <br> Artist Name : {{ data.artist_name }} <br> Song ID : {{ data.song_id }}</li>
-        {% endfor %}
+                    <div class="md:w-3/4 md:pl-8">
+                        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ playlist_name }}</h1>
+                        <p class="text-lg text-gray-700 dark:text-gray-300 mb-4">
+                            {% if metadata %}{{ metadata|length }} songs{% else %}0 songs{% endif %}
+                        </p>
 
-    </ol>
+                        <div class="flex flex-wrap gap-3 mb-6">
+                            <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <circle cx="12" cy="12" r="4"></circle>
+                                </svg>
+                                <span>{{ session['source-service']|capitalize if session['source-service'] else 'Unknown
+                                    Service' }}</span>
+                            </div>
+                        </div>
 
-    {% else %}
-    <p>No metadata available</p>
-    {% endif %}
+                        <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                            {% if metadata %}
+                            <a href="{{ url_for('destination') }}"
+                                class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg shadow-md font-medium transition-colors duration-300 flex items-center justify-center">
+                                <span>Continue to Transfer</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </a>
+                            {% endif %}
 
-    <!-- For redirecting back to source page -->
+                            {% if session['source-service'] %}
+                            {% if session[session['source-service'] + '_logged_in'] == 'False' or
+                            session[session['source-service'] + '_logged_in'] == False or
+                            session['source-service'] == 'jiosaavn' %}
+                            <a href="{{ url_for(session['source-service']) }}"
+                                class="border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 px-6 py-3 rounded-lg font-medium transition-colors duration-300 flex items-center justify-center">
+                                {% else %}
+                                <a href="{{ url_for(session['source-service'] + 'playlists') }}"
+                                    class="border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 px-6 py-3 rounded-lg font-medium transition-colors duration-300 flex items-center justify-center">
+                                    {% endif %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                                    </svg>
+                                    <span>Transfer Another Playlist</span>
+                                </a>
+                                {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    {% if session['source-service'] == 'spotify' %}
+        <!-- Playlist Songs List -->
+        <section class="py-6 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="bg-white dark:bg-gray-800 shadow-md rounded-xl overflow-hidden animate-fadeIn"
+                    style="animation-delay: 0.2s;">
+                    <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                        <div class="relative">
+                            <input type="text" id="search-songs" placeholder="Search songs..."
+                                class="pl-10 pr-4 py-2 w-full sm:w-80 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5 text-gray-400 absolute left-3 top-2.5" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </div>
+                    </div>
 
-    {% if session['spotify_logged_in'] == 'False' %}
-    <a href="/spotify">Transfer another Playlist</a><br>
-    {% else %}
-    <a href="/spotify/playlists">Transfer another Playlist</a><br>
-    {% endif %}
-    
-    {% elif session['source-service'] == 'youtube' %}
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        #
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Song
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Artist
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                {% if metadata %}
+                                {% for data in metadata %}
+                                <tr class="song-row">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{
+                                        loop.index }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 flex-shrink-0">
+                                                <img class="h-10 w-10 rounded-md"
+                                                    src="{{data.image_url}}"
+                                                    alt="Song cover">
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{
+                                                    data.song_name }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{
+                                        data.artist_name }}</td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="3"
+                                        class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">No songs
+                                        available</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
-    {% if session['youtube_logged_in'] == False %}
-    <a href="/youtube">Transfer another Playlist</a><br>
-    {% else %}
-    <a href="/youtube/playlists">Transfer another Playlist</a><br>
-    {% endif %}
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="text-center text-gray-400">
+            <p>&copy; 2025 MusicLink. All rights reserved.</p>
+        </div>
+    </footer>
 
-    {% elif session['source-service'] == 'youtubemusic' %}
-    
-    {% if session['youtube_music_logged_in'] == False %}
-    <a href="/youtubemusic">Transfer another Playlist</a><br>
-    {% else %}
-    <a href="/youtubemusic/playlists">Transfer another Playlist</a><br>
-    {% endif %}
+    <!-- JavaScript -->
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
 
-    {% endif %}
-    <a href="/logout">Logout</a>
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Dark mode toggle functionality
+        const desktopThemeToggle = document.getElementById('desktop-theme-toggle');
+        const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+
+        // Check for saved theme preference or use preferred color scheme
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // Function to toggle theme
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+
+            // Save preference
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Add event listeners to both theme toggle buttons
+        desktopThemeToggle.addEventListener('click', toggleTheme);
+        mobileThemeToggle.addEventListener('click', toggleTheme);
+
+        // Simple song search function
+        const searchInput = document.getElementById('search-songs');
+        const songRows = document.querySelectorAll('.song-row');
+
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+
+            songRows.forEach(row => {
+                const songTitle = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const artistName = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+
+                if (songTitle.includes(searchTerm) || artistName.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

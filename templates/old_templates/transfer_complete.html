@@ -3,31 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transfer to Youtube</title>
+    <title>Transfer Complete</title>
 </head>
 <body>
-    <h1>Playlist Metadata</h1>
-    {% if metadata %}
+    {% if session['playlist_name'] and session['playlist_url'] %}
 
-    <form action="" method="post">
-        <button type="submit">Start Transfer</button>
-    </form>
+    <h2>Your playlist songs are Transfered</h2>
+    <p>Your playlist {{session['playlist_name']}} is successfully transferred</p>
+    <p>Check it out <a href="{{session['playlist_url']}}" target="_blank">here</a></p>
 
-    {% if playlist_name %}
-    <h3>{{ playlist_name }}</h3>
-    {% endif %}
+    {% if not_found %}
+    <p>Sorry, we could not find these songs</p>
     <ol>
-
-        {% for data in metadata %}
-        <li> Song name : {{ data.song_name }} <br> Artist Name : {{ data.artist_name }}</li>
-        {% endfor %}
-
+    {% for song_name in not_found %}
+    <li>{{song_name}}</li>
+    {% endfor %}
     </ol>
-
     {% else %}
-    <p>No metadata available</p>
+    <p>All songs were transferred, none were missed</p>
     {% endif %}
+    
+    {% else %}
 
+    <h2>Your playlist failed to transfer</h2>
+
+    {% endif %}
 
     <!-- For redirecting back to source page -->
 

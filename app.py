@@ -44,7 +44,8 @@ YT_MUSIC_SCOPES = ['https://www.googleapis.com/auth/youtube.readonly', 'https://
 #Error Handler for Server Side Internal Error
 @app.errorhandler(Exception)
 def handle_exception(e):
-    return render_template("exception.html", error=e), 500
+    error = str(e)
+    return render_template("v0_templates/exception.html", error=error), 500
 
 #Error Handler for page not found
 @app.errorhandler(404)
@@ -54,11 +55,15 @@ def page_not_found(e):
 #Homepage
 @app.route("/")
 def index():
-    return render_template("index2.html")
+    return render_template("index.html")
 
 @app.route("/source")
 def source():
     return render_template("source.html")
+
+@app.route("/destination")
+def destination():
+    return render_template("destination.html")
 
 #Spotify Home Page
 @app.route("/spotify")
@@ -72,6 +77,8 @@ def spotify():
 def spotifylogin(user):
     if user not in ['source', 'target']:
         return redirect('/spotify/source')
+    session[f'{user}-service'] = 'spotify'
+    session['curr_user'] = user
     
     #Check if an user is already logged in
     temp_uid = session.get(user)
@@ -85,8 +92,6 @@ def spotifylogin(user):
                 #Returns to transfer page if user is target to transfer playlists
                 return redirect('/transfer/spotify')
     
-    session[f'{user}-service'] = 'spotify'
-    session['curr_user'] = user
     session[user] = str(uuid.uuid4())
     
     auth_manager = SpotifyOAuth(
@@ -146,27 +151,27 @@ def spotifyplaylists():
         playlist_id = request.form.get("playlist_id")
         if not playlist_id:
             return redirect(url_for("spotifyplaylists"))
-
         if playlist_id == "liked_songs":
             # Fetch Liked Songs
             metadata = spotify_helper.get_liked_songs(auth_manager)
             playlist_name = "Liked Songs"
+            playlist_image_url = "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da8470d229cb865e8d81cdce0889"
         else:
             # Fetch tracks from playlist
-            metadata_and_playlist_name = spotify_helper.get_spotify_tracks(sp, playlist_id)
-            metadata = metadata_and_playlist_name[0]
-            playlist_name = metadata_and_playlist_name[1]
-        
-        helper.upload_metadata(metadata, playlist_name)
+            metadata_data = spotify_helper.get_spotify_tracks(sp, playlist_id)
+            metadata = metadata_data[0]
+            playlist_name = metadata_data[1]
+            playlist_image_url = metadata_data[2]        
+        helper.upload_metadata(metadata, playlist_name, playlist_image_url)
         return redirect(url_for("playlist_metadata"))
     
     #Fetch User Playlists    
     playlists = spotify_helper.get_spotify_playlists(sp)
     if not playlists:
-        flash("Some error occurred while fetching your playlists")
+        flash("Some error occurred while fetching your playlists", "error")
         return redirect('/spotify')
 
-    return render_template("spotify/demo-playlists.html", playlists=playlists)
+    return render_template("spotify/playlists.html", playlists=playlists)
 
 #Spotify metadata from playlist url
 @app.route('/extract/spotify', methods=['POST'])
@@ -175,7 +180,7 @@ def extract_from_spotify():
     playlist_url = request.form.get('url')
     playlist_id = spotify_helper.extract_playlist_id(playlist_url)
     if not playlist_id:
-        flash("Invalid Spotify URL")
+        flash("Invalid Spotify URL", "error")
         return redirect(url_for("spotify"))
     
     auth_manager = SpotifyClientCredentials(
@@ -188,13 +193,13 @@ def extract_from_spotify():
     try:
         not_found = spotify_helper.extract_tracks_from_url(sp, playlist_id)
         if not_found:
-            flash("Your playlist seems to be empty !!")
+            flash("Your playlist seems to be empty !!", "error")
             return redirect(url_for("spotify"))
         session['spotify_logged_in'] = 'False'
         return redirect("/playlist/preview")
 
     except Exception as e:
-        flash("There was an error while fetching your playlist. It is either a private playlist or cannot be accessed by us")
+        flash("There was an error while fetching your playlist. It is either a private playlist or cannot be accessed by us", "error")
         return redirect(url_for("spotify"))
 
 #Youtube Homepage
@@ -210,6 +215,9 @@ def youtubelogin(user):
     if user not in ['source', 'target']:
         return redirect('/youtube/source')
     
+    session[f'{user}-service'] = 'youtube'
+    session['curr_user'] = user
+    
     #Check if an user is already logged in
     if f'{user}-credentials' in session:
         if user=='source':
@@ -217,8 +225,6 @@ def youtubelogin(user):
         else:
             return redirect(url_for('transfer_youtube'))
             
-    session[f'{user}-service'] = 'youtube'
-    session['curr_user'] = user
     
     flow = Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE,
@@ -269,17 +275,17 @@ def youtubeplaylists():
     scopes=credentials_data['scopes']
     )
     youtube = build('youtube', 'v3', credentials=credentials)
-    response = youtube.playlists().list(
-        part='snippet',
-        mine=True,
-        maxResults=10
-    ).execute()
-    
+    all_playlists = youtube_helper.get_all_playlists(youtube)    
+
     playlists = []
-    for item in response.get('items', []):
+    for item in all_playlists:
+        thumbnails = item['snippet'].get('thumbnails', {})
+        # Check for 'high' quality thumbnail, fallback to 'default'
+        playlist_image = thumbnails.get('high', thumbnails.get('default', {})).get('url', None)
         playlists.append({
             'title': item['snippet']['title'],
-            'id': item['id']
+            'id': item['id'],
+            'image': playlist_image 
         })
     
     if request.method == 'POST':
@@ -292,6 +298,7 @@ def youtubeplaylists():
         video_data = youtube_helper.fetch_yt_playlist_videos(playlist_id, headers)
         videos = video_data[0]
         playlist_name = video_data[1]
+        playlist_image_url = video_data[2]
         if not videos:
             return "There was some error fetching playlist details"
         video_data = []
@@ -302,10 +309,11 @@ def youtubeplaylists():
             video_id = snippet.get('resourceId', {}).get('videoId')  
             video_title = snippet.get('title')  
             channel_name = snippet.get('videoOwnerChannelTitle')  
+            video_image_url = snippet.get('thumbnails', {}).get('default', {}).get('url')
             if video_title and channel_name and video_title:
-                video_data.append({'song_name': video_title, 'artist_name': channel_name, 'song_id': video_id})
+                video_data.append({'song_name': video_title, 'artist_name': channel_name, 'song_id': video_id, 'image_url': video_image_url})
 
-        helper.upload_metadata(video_data, playlist_name)
+        helper.upload_metadata(video_data, playlist_name, playlist_image_url)
         return redirect(url_for("playlist_metadata"))
 
     return render_template('youtube/playlists.html', playlists=playlists)
@@ -317,10 +325,10 @@ def extract_from_youtube():
     try:
         youtube_helper.extract_youtube_playlist_videos(playlist_url)
     except ValueError:
-        flash("Invalid YouTube URL")
+        flash("Invalid YouTube URL", "error")
         return redirect(url_for("youtube"))
     except Exception as e:
-        flash("There was an error while fetching your playlist. It is either a private playlist or cannot be accessed by us")
+        flash("There was an error while fetching your playlist. It is either a private playlist or cannot be accessed by us", "error")
         return redirect(url_for("youtube"))
     session['youtube_logged_in'] = False
     return redirect(url_for('playlist_metadata'))
@@ -338,15 +346,18 @@ def youtubemusiclogin(user):
     if user not in ['source', 'target']:
         return redirect('/youtubemusic/source')
     
-    #Check if an user is already logged in
-    if f'{user}-ytmusic-credentials' in session:
-        if user=='source':
-            return redirect(url_for('youtubemusicplaylists'))
-        else:
-            return redirect(url_for('transfer_youtubemusic'))
-    
     session[f'{user}-service'] = 'youtubemusic'
     session['curr_user'] = user
+    
+    #Check if an user is already logged in
+    if f'{user}-ytmusic-credentials' in session:
+        auth_file = ytmusic_helper.get_auth_file(user)
+        if os.path.exists(auth_file):
+            if user=='source':
+                return redirect(url_for('youtubemusicplaylists'))
+            else:
+                return redirect(url_for('transfer_youtubemusic'))
+
     session[user] = str(uuid.uuid4())
     
     flow = Flow.from_client_secrets_file(
@@ -399,6 +410,7 @@ def youtubemusicplaylists():
             playlist_details = ytmusic.get_playlist(playlist_id)
             print(playlist_details)
             playlist_name = playlist_details['title'] if playlist_details['title'] else "Playlist"
+            playlist_image_url = playlist_details.get('thumbnails', [{}])[-1].get('url', None)
             songs = []
             print("Length  of ", playlist_name ," : " , len(playlist_details['tracks']))
 
@@ -406,10 +418,11 @@ def youtubemusicplaylists():
                 songs.append({
                     'song_name': track['title'],
                     'artist_name': ', '.join([artist['name'] for artist in track['artists']]),
-                    'song_id' : track['videoId']
+                    'song_id' : track['videoId'],
+                    'image_url': track.get('thumbnails', [{}])[-1].get('url', None)
                 })
         
-            helper.upload_metadata(songs, playlist_name)
+            helper.upload_metadata(songs, playlist_name, playlist_image_url)
             return redirect(url_for('playlist_metadata'))
         except Exception as e:
             return jsonify({"error": str(e)})
@@ -428,27 +441,29 @@ def extract_from_ytmusic():
     playlist_url = request.form.get('url')
     match = re.search(r"list=([a-zA-Z0-9_-]+)", playlist_url)
     if not match:
-        flash("Invalid YT Music URL")
+        flash("Invalid YT Music URL", "error")
         return redirect(url_for("youtubemusic"))
             
     playlist_id = match.group(1)
     try:
         ytmusic_helper.extract_tracks_from_playlist(ytmusic, playlist_id)
     except Exception as e:
-        return jsonify({"error": str(e)})
+        flash("There was an error while fetching your playlist. It is either a private playlist or cannot be accessed by us", "error")
+        return redirect(url_for("youtubemusic"))
     session['youtube_music_logged_in'] = False
     return redirect(url_for('playlist_metadata'))
 
 #JioSaavn Homepage
 @app.route("/jiosaavn", methods = ['GET', 'POST'])
 def jiosaavn():
+    
     session['source-service'] = 'jiosaavn'
     session['curr_user'] = 'source'
     
     if request.method == 'POST':
         playlist_url = request.form.get('url')
         if not playlist_url:
-            flash("No playlist URL found")
+            flash("No playlist URL found", "error")
             return redirect(url_for('jiosaavn'))
         metadata = []
         try:
@@ -459,15 +474,15 @@ def jiosaavn():
             if songs:
                 name = songs['listname']
                 for song in songs['songs']:
-                    metadata.append({'artist_name': song['primary_artists'], 'song_name' : song['song'], 'image': song['image']})
-                helper.upload_metadata(metadata, name)
+                    metadata.append({'artist_name': song['primary_artists'], 'song_name' : song['song'], 'image_url': song['image']})
+                helper.upload_metadata(metadata, name, 0)
                 return redirect(url_for('playlist_metadata'))
             else:
-                flash("Playlist does not exist or there was some error in fetching the tracks.")
+                flash("Playlist does not exist or there was some error in fetching the tracks.", "error")
                 return redirect(url_for('jiosaavn'))
     
         except Exception as e:
-            flash("Playlist does not exist or there was some error in fetching the tracks.", str(e))
+            flash(f"Playlist does not exist or there was some error in fetching the tracks. {str(e)}", "error")
             return redirect(url_for('jiosaavn'))
     
     return render_template('others/jiosaavn.html')
@@ -478,7 +493,9 @@ def playlist_metadata():
     playlist_data = helper.get_current_metadata()
     metadata = playlist_data['metadata'] if playlist_data else []
     playlist_name = playlist_data['playlist_name'] if playlist_data else "Unknown"
-    return render_template("preview.html", metadata=metadata, playlist_name=playlist_name)
+    playlist_image_url = playlist_data['url'] if playlist_data else 0
+    print(playlist_image_url)
+    return render_template("preview.html", metadata=metadata, playlist_name=playlist_name, url=playlist_image_url)
 
 #For Spotify transfer page
 @app.route("/transfer/spotify", methods=['POST', 'GET'])
@@ -563,9 +580,9 @@ def transfer_spotify():
                 temp_batch = track_uris[i:i+100]
                 sp.playlist_add_items(playlist_id, temp_batch)
 
-        return render_template("transfer_complete.html", not_found=not_found)
+        return render_template("final.html", not_found=not_found)
     
-    return render_template("spotify/transfer.html", metadata=metadata, playlist_name=playlist_name)
+    return render_template("transfer.html", metadata=metadata, playlist_name=playlist_name)
 
 #For Youtube transfer page
 @app.route('/transfer/youtube', methods = ['GET', 'POST'])
@@ -619,14 +636,14 @@ def transfer_youtube():
                     not_found.append(song['song_name'])
         
         else:
-    
             for song in metadata:
                 id = youtube_helper.search_song_on_youtube(song['song_name'], song['artist_name'], youtube)
                 if id != "NO_VIDEO_FOUND":
+                    print(f"{song['song_name']} found on YouTube")
                     ids.append({'song_name': song['song_name'], 'id': id})
                 else:
                     not_found.append(song['song_name'])
-
+                    
         if ids:
             for id in ids:
                 try:
@@ -659,12 +676,12 @@ def transfer_youtube():
             session['playlist_name'] = playlist_name
             session['playlist_url'] = f"https://www.youtube.com/playlist?list={playlist_id}"
             
-            return render_template('transfer_complete.html', not_found=not_found)
+            return render_template('final.html', not_found=not_found)
         
         else:
             return "No songs to add"
         
-    return render_template('youtube/transfer.html',  metadata=metadata, playlist_name=playlist_name)
+    return render_template('transfer.html',  metadata=metadata, playlist_name=playlist_name)
 
 #For Youtube Music transfer page
 @app.route('/transfer/youtubemusic', methods = ['GET', 'POST'])
@@ -715,11 +732,11 @@ def transfer_youtubemusic():
             session['playlist_name'] = playlist_name
             session['playlist_url'] = f"https://music.youtube.com/playlist?list={playlist_id}"
 
-            return render_template('transfer_complete.html', not_found=not_found)
+            return render_template('final.html', not_found=not_found)
 
         return "No songs to add"
 
-    return render_template('youtubemusic/transfer.html', metadata=metadata, playlist_name=playlist_name)
+    return render_template('transfer.html', metadata=metadata, playlist_name=playlist_name)
 
 @app.route("/logout")
 def logout():

@@ -2,12 +2,38 @@ import requests
 import re
 import os
 import helper
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 API_KEY = os.getenv('YOUTUBE_API_KEY')
 YOUTUBE_VIDEOS_URL = "https://www.googleapis.com/youtube/v3/videos"
 YOUTUBE_PLAYLIST_ITEMS_URL = "https://www.googleapis.com/youtube/v3/playlistItems"
 YOUTUBE_PLAYLIST_URL = "https://www.googleapis.com/youtube/v3/playlists"
 
+# Function to get all playlists
+def get_all_playlists(youtube):
+    all_playlists = []
+    next_page_token = None
+
+    while True:
+        # Request playlists with pagination
+        response = youtube.playlists().list(
+            part='snippet',
+            mine=True,
+            maxResults=50,  # Max allowed per request
+            pageToken=next_page_token
+        ).execute()
+
+        # Add current page's playlists to the list
+        all_playlists.extend(response['items'])
+
+        # Get nextPageToken, if available
+        next_page_token = response.get('nextPageToken')
+        
+        # Stop when there are no more pages
+        if not next_page_token:
+            break
+    return all_playlists
 
 #For fetching Youtube Playlist videos with user logged in
 def fetch_yt_playlist_videos(playlist_id, headers):
@@ -22,6 +48,7 @@ def fetch_yt_playlist_videos(playlist_id, headers):
         return False, "Playlist not found"
 
     playlist_name = playlist_data['items'][0]['snippet']['title']
+    playlist_image_url = playlist_data['items'][0]['snippet']['thumbnails']['high']['url']
     videos = [] 
     next_page_token = None
     while True:
@@ -41,7 +68,7 @@ def fetch_yt_playlist_videos(playlist_id, headers):
         next_page_token = data.get('nextPageToken')
         if not next_page_token:
             break
-    return [videos, playlist_name]
+    return [videos, playlist_name, playlist_image_url]
 
 #For cleaning youtube video title
 def clean_song_title(title):
@@ -116,7 +143,7 @@ def extract_youtube_playlist_videos(playlist_url):
                 "song_name": details["title"],
                 "song_id": video_id,
                 "artist_name": details["uploader_channel"],
-                # "video_url": f"https://www.youtube.com/watch?v={video_id}"
+                "image_url": details["image_url"],
             })
     
         # Check if there are more pages
@@ -125,11 +152,11 @@ def extract_youtube_playlist_videos(playlist_url):
         else:
             break  # No more pages
     
-    playlist_name = get_playlist_name(playlist_id)
+    playlist_name, playlist_image_url = get_playlist_name(playlist_id)
     if not playlist_name:
         playlist_name = "Youtube Playlist"
     
-    helper.upload_metadata(videos, playlist_name)
+    helper.upload_metadata(videos, playlist_name, playlist_image_url)
     
 #Getting video details (Title, Channel Name)
 def get_video_details(video_ids):
@@ -148,6 +175,7 @@ def get_video_details(video_ids):
         video_details[video_id] = {
             "title": item["snippet"]["title"],
             "uploader_channel": item["snippet"]["channelTitle"],
+            "image_url": item["snippet"]["thumbnails"]["high"]["url"]
         }
     
     return video_details
@@ -164,11 +192,11 @@ def get_playlist_name(playlist_id):
 
     # Extract and return playlist name
     if "items" in data and len(data["items"]) > 0:
-        return data["items"][0]["snippet"]["title"]
+        return data["items"][0]["snippet"]["title"], data["items"][0]["snippet"]["thumbnails"]["high"]["url"]
     else:
         return None
     
-#Searching Video ID from query
+# Function to search for a song on YouTube
 def search_song_on_youtube(song_name, artist_name, youtube_service):
     search_request = youtube_service.search().list(
         q=f"Song {song_name} by {artist_name}",

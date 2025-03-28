@@ -97,16 +97,16 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <a href="index.html" class="flex items-center">
-                        <img src="./logo.png" alt="" class="h-8 w-8">
+                    <a href="{{ url_for('index') }}" class="flex items-center">
+                        <img src="{{ url_for('static', filename='logo.png') }}" alt="" class="h-8 w-8">
                         <span class="ml-2 text-xl font-bold text-gray-900 dark:text-white">MusicLink</span>
                     </a>
                 </div>
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="index.html"
+                    <a href="{{ url_for('index') }}"
                         class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors font-bold">Home</a>
-                    <a href="source.html" class="text-primary dark:text-primary-light font-bold">Convert</a>
-                    <a href="index.html#how-it-works"
+                    <a href="{{ url_for('source') }}" class="text-primary dark:text-primary-light font-bold">Convert</a>
+                    <a href="{{ url_for('index') }}#how-it-works"
                         class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors font-bold">How
                         It Works</a>
                 </div>
@@ -174,10 +174,10 @@
         <!-- Mobile menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-900 pb-4 px-4 transition-all duration-300">
             <div class="flex flex-col space-y-4">
-                <a href="index.html"
+                <a href="{{ url_for('index') }}"
                     class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors font-bold">Home</a>
-                <a href="source.html" class="text-primary dark:text-primary-light font-bold">Convert</a>
-                <a href="index.html#how-it-works"
+                <a href="{{ url_for('source') }}" class="text-primary dark:text-primary-light font-bold">Convert</a>
+                <a href="{{ url_for('index') }}#how-it-works"
                     class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors font-bold">How
                     It Works</a>
             </div>
@@ -207,8 +207,7 @@
                         <div class="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-lg p-6 mb-8">
                             <h2 class="text-lg font-semibold text-red-800 dark:text-red-400 mb-2">Error Details</h2>
                             <p class="text-red-700 dark:text-red-300 font-mono text-sm">
-                                Error Code: 500 - Internal Server Error<br>
-                                Message: Unable to connect to the music service API. Please try again later.
+                                Message: {{ error }}.
                             </p>
                         </div>
                         
@@ -254,7 +253,7 @@
                                 </svg>
                                 <span>Go Back</span>
                             </a>
-                            <a href="index.html" class="border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 px-6 py-3 rounded-lg font-medium transition-colors duration-300 flex items-center justify-center">
+                            <a href="{{ url_for('index') }}" class="border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 px-6 py-3 rounded-lg font-medium transition-colors duration-300 flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                     <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -263,12 +262,6 @@
                             </a>
                         </div>
                     </div>
-                </div>
-                
-                <div class="mt-8 text-center">
-                    <p class="text-gray-600 dark:text-gray-400">
-                        Need help? <a href="#" class="text-primary dark:text-primary-light hover:underline">Contact our support team</a>
-                    </p>
                 </div>
             </div>
         </section>

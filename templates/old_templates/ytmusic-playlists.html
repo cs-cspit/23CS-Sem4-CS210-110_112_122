@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your YouTube Music Playlists</title>
+</head>
+<body>
+    <h1>Your YouTube Music Playlists</h1>
+    
+    {% if playlists %}
+    <form action="{{ url_for('youtubemusicplaylists') }}" method="POST">
+        <label for="playlist">Select Playlist:</label>
+        <select name="playlist_id" id="playlist" required>
+            <option value="">-- Select a Playlist --</option>
+            {% for playlist in playlists %}
+                <option value="{{ playlist['playlistId'] }}">{{ playlist["title"] }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <button type="submit">View Metadata</button>
+    </form>
+
+    {% else %}
+        <p>You don't have any playlists.</p>
+    {% endif %}
+
+    <br>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+</html>

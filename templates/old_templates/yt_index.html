@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Youtube</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'rgba(255, 0, 0, 0.8)',
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="bg-gray-100 font-sans overflow-x-hidden flex flex-col min-h-screen">
+
+    <nav class="fixed top-0 w-full bg-white shadow-md z-50 font-sans">
+        <div class="container mx-auto px-10 lg:px-7 py-6 flex justify-between items-center">
+            <div class="text-3xl font-bold text-purple-600">MusicLink</div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow mt-28">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            
+            <h1 class="text-3xl font-bold text-center mb-12">Import Playlist form <span class="text-primary">Youtube</span></h1>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4">Login to your Youtube Account</h3>
+                    <p class="text-gray-600 mb-6">Access all your playlists by logging in to your account</p>
+                    <a href="{{url_for('youtubelogin', user = 'source')}}" 
+                        class="block w-full px-6 py-2 text-white rounded-lg hover:bg-opacity-90 transition-all duration-200 font-semibold text-center bg-primary">
+                        Login with Youtube
+                    </a>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4">Enter Public Playlist URL</h3>
+                    <div class="space-y-4">
+                        <form action="{{url_for('extract_from_youtube')}}" method="post">
+                            <input type="text" name="url" requiered placeholder="https://www.youtube.com/playlist?list=..." required
+                                class="w-full p-2 mt-2 mb-6 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            <input type="submit" value="Continue"
+                                class="block w-full px-6 py-2 text-white rounded-lg hover:bg-opacity-90 transition-all duration-200 font-semibold text-center cursor-pointer bg-primary">
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% with messages = get_flashed_messages() %}
+
+            {% if messages %}
+            <div class="mx-auto mt-10">
+                <ol>
+                    {% for message in messages %}
+
+                    <div class="flex items-center p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50" role="alert">
+                        <svg class="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                            fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                        </svg>
+                        <span class="sr-only">Info</span>
+                        <div>
+                            <span class="font-medium">Alert!</span> {{message}}
+                        </div>
+                    </div>
+
+                    {% endfor %}
+                </ol>
+            </div>
+            {% endif %}
+
+            {% endwith %}
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy;
+                <script>document.write(new Date().getFullYear());</script> MusicLink. All rights reserved.
+            </p>
+        </div>
+    </footer>
+</body>
+
+</html>

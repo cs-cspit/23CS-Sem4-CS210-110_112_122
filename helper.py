@@ -21,7 +21,8 @@ def add_index():
     collection.create_index(field_name, expireAfterSeconds=expire_after_seconds)
 
 #For uploading the metadata to database
-def upload_metadata(metadata, playlist_name, source=None):
+def upload_metadata(metadata, playlist_name, url, source=None):
+    print("Url in helper",url)
     if 'meta_uuid' not in session:
         temp_uid = str(uuid.uuid4())
         session['meta_uuid'] = temp_uid
@@ -32,6 +33,7 @@ def upload_metadata(metadata, playlist_name, source=None):
     playlist_data = {
         "_id": temp_uid,
         "playlist_name": playlist_name,
+        "url": url,
         "metadata": metadata,  
         "source": source,
         "createdAt": datetime.utcnow()
