@@ -22,7 +22,6 @@ def add_index():
 
 #For uploading the metadata to database
 def upload_metadata(metadata, playlist_name, url, source=None):
-    print("Url in helper",url)
     if 'meta_uuid' not in session:
         temp_uid = str(uuid.uuid4())
         session['meta_uuid'] = temp_uid

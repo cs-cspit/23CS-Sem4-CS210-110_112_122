@@ -5,12 +5,12 @@ from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError
+from ytmusicapi import YTMusic
 import re
 import os
 import json
 import uuid
 from dotenv import load_dotenv
-from ytmusicapi import YTMusic
 import asyncio
 import helper
 import spotify_helper
@@ -45,7 +45,7 @@ YT_MUSIC_SCOPES = ['https://www.googleapis.com/auth/youtube.readonly', 'https://
 @app.errorhandler(Exception)
 def handle_exception(e):
     error = str(e)
-    return render_template("v0_templates/exception.html", error=error), 500
+    return render_template("exception.html", error=error), 500
 
 #Error Handler for page not found
 @app.errorhandler(404)

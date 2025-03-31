@@ -41,7 +41,6 @@ def get_liked_songs(auth_manager):
         )
 
         results = sp.next(results) if results["next"] else None
-
     return liked_songs
 
 # Function to extract Spotify playlist ID from URL

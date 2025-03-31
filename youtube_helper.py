@@ -48,7 +48,7 @@ def fetch_yt_playlist_videos(playlist_id, headers):
         return False, "Playlist not found"
 
     playlist_name = playlist_data['items'][0]['snippet']['title']
-    playlist_image_url = playlist_data['items'][0]['snippet']['thumbnails']['high']['url']
+    playlist_image_url = playlist_data['items'][0]['snippet']['thumbnails']['default']['url']
     videos = [] 
     next_page_token = None
     while True:
@@ -175,7 +175,7 @@ def get_video_details(video_ids):
         video_details[video_id] = {
             "title": item["snippet"]["title"],
             "uploader_channel": item["snippet"]["channelTitle"],
-            "image_url": item["snippet"]["thumbnails"]["high"]["url"]
+            "image_url": item["snippet"]["thumbnails"]["default"]["url"]
         }
     
     return video_details
@@ -192,7 +192,7 @@ def get_playlist_name(playlist_id):
 
     # Extract and return playlist name
     if "items" in data and len(data["items"]) > 0:
-        return data["items"][0]["snippet"]["title"], data["items"][0]["snippet"]["thumbnails"]["high"]["url"]
+        return data["items"][0]["snippet"]["title"], data["items"][0]["snippet"]["thumbnails"]["default"]["url"]
     else:
         return None
     
