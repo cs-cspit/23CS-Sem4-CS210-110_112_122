@@ -34,4 +34,32 @@ The project will soon be hosted live for public use. Stay tuned for updates!
 
 ### Clone this repository:
 ```bash
-git clone https://github.com/your-username/musiclink.git
+git clone https://github.com/harshil-mistry/musiclink-playlist-converter.git
+```
+
+### Install Dependencies
+```bash
+cd musiclink-playlist-converter
+pip install -r requirements.txt
+```
+
+### Set up environment variables:
+Create a `.env` file in the root directory and add the following:
+```bash
+SPOTIPY_CLIENT_ID = ''
+SPOTIPY_CLIENT_SECRET = '' 
+SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/spotifycallback'
+MONGODB_URL = ""
+YOUTUBE_API_KEY = ""
+```
+
+> Note: You will have to setup spotify and Google Projects and add your accounts for demo usage
+
+---
+
+## 📝 Usage
+
+1. **Log in**: Use your Source platform account to authenticate and access your playlists.
+2. **Select your playlists**: Choose the playlist you want to transfer.
+3. **Choose your destination**: Pick the platform or account where you want the playlist transferred.
+4. **Track progress**: Watch your playlists being transferred in real time!
