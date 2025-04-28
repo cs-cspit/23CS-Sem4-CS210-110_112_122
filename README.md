@@ -56,8 +56,8 @@ YOUTUBE_API_KEY = ""
 > Note: You will have to setup spotify and Google Projects and add your accounts for demo usage
 
 ### Set up MongoDB:
--Create a Database named 'Playlist_Conversion'
--Create a collection in that Databse named 'metadata'
+- Create a Database named 'Playlist_Conversion'.
+- Create a collection in that Databse named 'metadata'.
 
 ---
 
